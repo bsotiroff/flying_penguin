@@ -9,19 +9,19 @@
     phx-submit="search">
   
     <%= label f, :origin %>
-    <%= text_input f, :origin, value: "ORD" %>
+    <%= text_input f, :origin, placeholder: "ord" %>
     <%= error_tag f, :origin %>
   
     <%= label f, :destination %>
-    <%= text_input f, :destination, value: "ATL" %>
+    <%= text_input f, :destination, placeholder: "bkk" %>
     <%= error_tag f, :destination %>
   
     <%= label f, :date_of_departure %>
-    <%= date_select f, :date_of_departure, default: DateTime.utc_now() |> DateTime.add(150 * 60 * 60 * 24, :second)%>
+    <%= date_select f, :date_of_departure, default: DateTime.utc_now() %>
     <%= error_tag f, :date_of_departure %>
   
     <%= label f, :date_of_return %>
-    <%= date_select f, :date_of_return, default: DateTime.utc_now() |> DateTime.add(180 * 60 * 60 * 24, :second) %>
+    <%= date_select f, :date_of_return, default: DateTime.utc_now() |> DateTime.add(3 * 60 * 60 * 24, :second) %>
     <%= error_tag f, :date_of_return %>
   
     <%= label f, :seat_class %>
@@ -38,37 +38,4 @@
   </.form>
 </div>
 
-<%= if @response != "response" do%>
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-      <tr>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrier</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stops</th>
-        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <%= for offer <- @response.duffel_offers do %>
-        <tr>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900"><%= offer.carrier %></div>
-              </div>
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900"><%= offer.departing_at %>-<%= offer.arriving_at %></div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900"><%= offer.number_of_stops %></div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900"><%= offer.base_amount %></div>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+<%= {:ok, v} = Access.fetch(assigns, :response); v %>
