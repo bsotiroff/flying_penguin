@@ -54,12 +54,6 @@ defmodule FlyingPenguin.Duffel.Client do
   end
 
   defp get_stops(offer) do
-    # Enum.map(offer[:slices], fn slice ->
-    #   IO.inspect(slice[:segments].length)
-    # end)
-    # Enum.reduce(offer.slices, fn slice, acc ->
-    #   Enum.min(acc, slice.segments.length - 1)
-    # end)
     [ slice | _] = offer.slices
     length(slice.segments) - 1
   end
@@ -87,12 +81,7 @@ defmodule FlyingPenguin.Duffel.Client do
         origin: search_params["origin"],
         destination: search_params["destination"],
         departure_date: map_to_iso8601(search_params["date_of_departure"])
-      },
-      # %{
-      #   origin: search_params["destination"],
-      #   destination: search_params["origin"],
-      #   departure_date: map_to_iso8601(search_params["date_of_return"])
-      # }
+      }
     ]
     passengers = Enum.map(List.duplicate(:elem, String.to_integer(search_params["number_of_adults"])), fn _x -> %{ type: "adult" } end)
     %Request{}
