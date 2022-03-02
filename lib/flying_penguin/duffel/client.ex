@@ -14,21 +14,12 @@ defmodule FlyingPenguin.Duffel.Client do
       "Authorization": "Bearer #{System.get_env("DUFFEL_TOKEN")}"
     ]
 
-    case HTTPoison.post("https://api.duffel.com/air/offer_requests?return_offers=true", request_body(search_params), request_headers, [recv_timeout: 20000]) do
-      {:ok, %Response{status_code: 200, body: body }} ->
-        IO.puts body
+    url = "https://api.duffel.com/air/offer_requests?return_offers=true"
+    case HTTPoison.post(url, build_request_body(search_params), request_headers, [recv_timeout: 20000]) do
       {:ok, %Response{status_code: 201, body: raw }} ->
-        IO.puts "it was a 201!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         raw
         |> :zlib.gunzip
         |> Poison.decode(keys: :atoms)
-      {:ok, %Response{status_code: 422, body: raw }} ->
-        IO.puts "It Was a 422 :(((((((((((((((((((((((((((((((((((((((((("
-        IO.puts raw
-        |> :zlib.gunzip
-        |> Poison.decode(keys: :atoms)
-      {:ok, %Response{status_code: 404}} ->
-        IO.puts "Not found :("
       {:error, %Error{reason: reason}} ->
         IO.inspect "there was an error"
         IO.inspect reason
@@ -66,16 +57,11 @@ defmodule FlyingPenguin.Duffel.Client do
 
   defp get_final_arrival_time(offer) do
     [ slice | _] = offer.slices
-    [_ | segment] = slice.segments # this assumes that the segments are in chronological order. I'm not sure if that's the case
+    [_ | segment] = slice.segments
     segment[:arriving_at]
   end
 
-  defp request_body(search_params) do
-    build_request(search_params)
-    |> wrap_request()
-  end
-
-  defp build_request(search_params) do
+  defp build_request_body(search_params) do
     slices = [
       %{
         origin: search_params["origin"],
@@ -88,6 +74,7 @@ defmodule FlyingPenguin.Duffel.Client do
     |> Map.put(:slices, slices)
     |> Map.put(:cabin_class, search_params["seat_class"])
     |> Map.put(:passengers, passengers)
+    |> wrap_request()
   end
 
   defp wrap_request(request) do
