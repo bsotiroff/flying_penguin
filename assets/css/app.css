@@ -120,9 +120,6 @@ main {
   border-radius: 6px;
 }
 
-#search-form_destination {
-  clear:right;
-}
 label {
   font-weight: 300;
 }
