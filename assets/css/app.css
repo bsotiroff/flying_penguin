@@ -107,3 +107,38 @@
   display: block;
   margin: -1rem 0 2rem;
 }
+
+main {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+#search-form_origin, #search-form_destination, #search-form_date_of_departure_year,
+#search-form_date_of_departure_month, #search-form_date_of_departure_day,
+#search-form_date_of_departure_year, #search-form_date_of_return_year, #search-form_date_of_return_month,
+#search-form_date_of_return_day, #search-form_seat_class, #search-form_number_of_adults {
+  color: grey;
+  border-radius: 6px;
+}
+
+#search-form_destination {
+  clear:right;
+}
+label {
+  font-weight: 300;
+}
+
+#search-form_number_of_adults {
+  width: 4em;
+}
+
+[type="submit"] {
+  color: white;
+  display: block;
+  outline-color: #aaa;
+  width: auto;
+  background-color: #aaa;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 30px;
+}

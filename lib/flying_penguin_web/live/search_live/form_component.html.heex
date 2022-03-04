@@ -8,10 +8,13 @@
     phx-target={@myself}
     phx-change="validate"
     phx-submit="search">
+
+    <div id="origin-wrapper">
   
     <%= label f, :origin %>
     <%= text_input f, :origin, placeholder: "ord" %>
     <%= error_tag f, :origin %>
+    </div>
   
     <%= label f, :destination %>
     <%= text_input f, :destination, placeholder: "bkk" %>
@@ -33,8 +36,8 @@
     <%= number_input f, :number_of_adults, value: 1 %>
     <%= error_tag f, :number_of_adults %>
   
-    <div>
+
       <%= submit "Search", phx_disable_with: "Searching..." %>
-    </div>
+
   </.form>
 </div>
