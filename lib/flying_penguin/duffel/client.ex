@@ -14,23 +14,27 @@ defmodule FlyingPenguin.Duffel.Client do
       "Authorization": "Bearer #{System.get_env("DUFFEL_TOKEN")}"
     ]
 
-    url = "https://api.duffel.com/air/offer_requests?return_offers=true"
+    url = "https://api.duffel.com/air/offer_requests?return_offers=false"
     case HTTPoison.post(url, build_request_body(search_params), request_headers, [recv_timeout: 20000]) do
       {:ok, %Response{status_code: 201, body: raw }} ->
         raw
         |> :zlib.gunzip
         |> Poison.decode(keys: :atoms)
+        |> unwrap_response()
+        |> Map.get(:id)
+        |> list_offers()
       {:error, %Error{reason: reason}} ->
         IO.inspect "there was an error"
-        IO.inspect reason
+        IO.inspect(reason, label: "error in offer_request")
     end
   end
 
   def parse_response(response) do
-    IO.inspect(response[:id], label: "offer request id")
+    [first_offer | _] = response
+
     %DuffelResponse{}
-    |> Map.put(:cabin_class, response[:cabin_class])
-    |> Map.put(:duffel_offers, parse_offers(response[:offers]))
+    |> Map.put(:cabin_class, first_offer[:cabin_class])
+    |> Map.put(:duffel_offers, parse_offers(response))
   end
 
   defp parse_offers(offers) do
@@ -42,6 +46,27 @@ defmodule FlyingPenguin.Duffel.Client do
       |> Map.put(:arriving_at, get_final_arrival_time(offer))
       |> Map.put(:number_of_stops, get_stops(offer))
     end)
+  end
+
+  def list_offers(request_id) do
+    number_of_offers = 5
+    list_url = "https://api.duffel.com/air/offers?offer_request_id=#{request_id}&sort=total_amount&limit=#{number_of_offers}"
+    request_headers = [
+      "Accept-Encoding": "gzip",
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Duffel-Version": "beta",
+      "Authorization": "Bearer #{System.get_env("DUFFEL_TOKEN")}"
+    ]
+    case HTTPoison.get(list_url, request_headers, [recv_timeout: 20000]) do
+      {:ok, %Response{body: raw}} ->
+        raw
+        |> :zlib.gunzip
+        |> Poison.decode(keys: :atoms)
+        |> unwrap_response()
+      {:error, %Error{reason: reason}} ->
+        IO.inspect(reason, label: "error in list request")
+    end
   end
 
   defp get_stops(offer) do
@@ -79,6 +104,10 @@ defmodule FlyingPenguin.Duffel.Client do
 
   defp wrap_request(request) do
     Poison.encode!(%{data: request})
+  end
+
+  def unwrap_response({:ok, %{data: response}}) do
+    response
   end
 
   defp map_to_iso8601(map) do

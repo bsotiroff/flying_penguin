@@ -41,8 +41,7 @@ defmodule FlyingPenguinWeb.SearchLive.New do
   end
 
   def handle_event("search", %{"search" => search_params}, socket) do
-    IO.inspect search_params
-    {:ok, %{data: response}} = Client.get_offers(search_params)
+    response = Client.get_offers(search_params)
 
     # insert method to parse response for display
     {:noreply, assign(socket, response: Client.parse_response(response))}
