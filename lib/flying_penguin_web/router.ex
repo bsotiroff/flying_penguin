@@ -20,14 +20,15 @@ defmodule FlyingPenguinWeb.Router do
   scope "/", FlyingPenguinWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
-    live "/search", SearchLive.New, :new
+    # live "/", PageLive, :index
+    # live "/search", SearchLive.New, :new
+    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", FlyingPenguinWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", FlyingPenguinWeb do
+    pipe_through :api
+  end
 
   # Enables LiveDashboard only for development
   #
@@ -50,38 +51,38 @@ defmodule FlyingPenguinWeb.Router do
 
   ## Authentication routes
 
-  scope "/", FlyingPenguinWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated, :put_session_layout]
+  # scope "/", FlyingPenguinWeb do
+  #   pipe_through [:browser, :redirect_if_user_is_authenticated, :put_session_layout]
 
-    get "/users/register", UserRegistrationController, :new
-    post "/users/register", UserRegistrationController, :create
-    get "/users/log_in", UserSessionController, :new
-    post "/users/log_in", UserSessionController, :create
-    get "/users/reset_password", UserResetPasswordController, :new
-    post "/users/reset_password", UserResetPasswordController, :create
-    get "/users/reset_password/:token", UserResetPasswordController, :edit
-    put "/users/reset_password/:token", UserResetPasswordController, :update
-  end
+  #   get "/users/register", UserRegistrationController, :new
+  #   post "/users/register", UserRegistrationController, :create
+  #   get "/users/log_in", UserSessionController, :new
+  #   post "/users/log_in", UserSessionController, :create
+  #   get "/users/reset_password", UserResetPasswordController, :new
+  #   post "/users/reset_password", UserResetPasswordController, :create
+  #   get "/users/reset_password/:token", UserResetPasswordController, :edit
+  #   put "/users/reset_password/:token", UserResetPasswordController, :update
+  # end
 
-  scope "/", FlyingPenguinWeb do
-    pipe_through [:browser, :require_authenticated_user]
+  # scope "/", FlyingPenguinWeb do
+  #   pipe_through [:browser, :require_authenticated_user]
 
-    get "/users/settings", UserSettingsController, :edit
-    put "/users/settings", UserSettingsController, :update
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
-  end
+  #   get "/users/settings", UserSettingsController, :edit
+  #   put "/users/settings", UserSettingsController, :update
+  #   get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  # end
 
-  scope "/", FlyingPenguinWeb do
-    pipe_through [:browser]
+  # scope "/", FlyingPenguinWeb do
+  #   pipe_through [:browser]
 
-    delete "/users/log_out", UserSessionController, :delete
-    get "/users/confirm", UserConfirmationController, :new
-    post "/users/confirm", UserConfirmationController, :create
-    get "/users/confirm/:token", UserConfirmationController, :edit
-    post "/users/confirm/:token", UserConfirmationController, :update
-  end
+  #   delete "/users/log_out", UserSessionController, :delete
+  #   get "/users/confirm", UserConfirmationController, :new
+  #   post "/users/confirm", UserConfirmationController, :create
+  #   get "/users/confirm/:token", UserConfirmationController, :edit
+  #   post "/users/confirm/:token", UserConfirmationController, :update
+  # end
 
-  if Mix.env() == :dev do
-    forward "/sent_emails", Bamboo.SentEmailViewerPlug
-  end
+  # if Mix.env() == :dev do
+  #   forward "/sent_emails", Bamboo.SentEmailViewerPlug
+  # end
 end
