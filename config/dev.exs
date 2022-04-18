@@ -18,22 +18,33 @@ config :flying_penguin, FlyingPenguin.Repo,
 config :flying_penguin, FlyingPenguinWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 4000,
+    protocol_options: [
+      request_timeout: 20_000
+    ]],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: System.get_env("FLYING_PENGUIN_KEY_BASE"),
   watchers: [
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    npx: [
-      "tailwindcss",
-      "--input=css/app.css",
-      "--output=../priv/static/assets/app.css",
-      "--postcss",
-      "--watch",
-      cd: Path.expand("../assets", __DIR__)
-    ]
+    # esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    # npx: [
+    #   "tailwindcss",
+    #   "--input=css/app.css",
+    #   "--output=../priv/static/assets/app.css",
+    #   "--postcss",
+    #   "--watch",
+    #   cd: Path.expand("../assets", __DIR__)
+    # ]
+    # node: [
+      # "node_modules/webpack/bin/webpack.js",
+      # "--mode",
+      # "development",
+      # "--watch-stdin",
+      # cd: Path.expand("../assets", __DIR__)
+    # ]
   ]
 
 # ## SSL Support
@@ -69,6 +80,14 @@ config :flying_penguin, FlyingPenguinWeb.Endpoint,
       ~r"lib/flying_penguin_web/(live|views)/.*(ex)$",
       ~r"lib/flying_penguin_web/templates/.*(eex)$"
     ]
+  ],
+  http: [
+    port: 4000,
+    protocol_options: [
+      request_timeout: 20_000,
+      inactivity_timeout: 300_000, # default
+      idle_timeout: 60_000         # default
+    ]
   ]
 
 # Do not include metadata nor timestamps in development logs
@@ -81,5 +100,4 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
-config :flying_penguin, FlyingPenguin.Mailer,
-  adapter: Bamboo.LocalAdapter
+config :flying_penguin, FlyingPenguin.Mailer, adapter: Bamboo.LocalAdapter
