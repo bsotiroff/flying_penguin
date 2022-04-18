@@ -2,28 +2,8 @@ defmodule FlyingPenguin.Duffel.Client do
   alias HTTPoison.Response
   alias HTTPoison.Error
   alias FlyingPenguin.Duffel.Request
-  # alias FlyingPenguin.Duffel.Response, as: DuffelResponse
-
-  # def request_body do
-  #   Poison.encode!(%{
-  #     data: %{
-  #       slices: [
-  #         %{
-  #           origin: "NYC",
-  #           destination: "ATL",
-  #           departure_date: "2022-06-21"
-  #         },
-  #         %{
-  #           origin: "ATL",
-  #           destination: "NYC",
-  #           departure_date: "2022-07-21"
-  #         }
-  #       ],
-  #       passengers: [ %{ type: "adult" }, %{ type: "adult" }, %{ age: 1 }],
-  #       cabin_class: "business"
-  #     }
-  #   })
-  # end
+  alias FlyingPenguin.Duffel.Response, as: DuffelResponse
+  alias FlyingPenguin.Duffel.Offer, as: DuffelOffer
 
   def get_offers(search_params) do
     request_headers = [
@@ -55,6 +35,41 @@ defmodule FlyingPenguin.Duffel.Client do
     end
   end
 
+  def parse_response(response) do
+    IO.inspect(response[:id], label: "offer request id")
+    %DuffelResponse{}
+    |> Map.put(:cabin_class, response[:cabin_class])
+    |> Map.put(:duffel_offers, parse_offers(response[:offers]))
+  end
+
+  defp parse_offers(offers) do
+    Enum.map(offers, fn offer ->
+      %DuffelOffer{}
+      |> Map.put(:base_amount, offer[:base_amount])
+      |> Map.put(:carrier, offer[:owner][:name])
+      |> Map.put(:departing_at, get_first_departure_time(offer))
+      |> Map.put(:arriving_at, get_final_arrival_time(offer))
+      |> Map.put(:number_of_stops, get_stops(offer))
+    end)
+  end
+
+  defp get_stops(offer) do
+    [ slice | _] = offer.slices
+    length(slice.segments) - 1
+  end
+
+  defp get_first_departure_time(offer) do
+    [ slice | _] = offer.slices
+    [segment | _] = slice.segments
+    segment[:departing_at]
+  end
+
+  defp get_final_arrival_time(offer) do
+    [ slice | _] = offer.slices
+    [_ | segment] = slice.segments # this assumes that the segments are in chronological order. I'm not sure if that's the case
+    segment[:arriving_at]
+  end
+
   defp request_body(search_params) do
     build_request(search_params)
     |> wrap_request()
@@ -66,14 +81,9 @@ defmodule FlyingPenguin.Duffel.Client do
         origin: search_params["origin"],
         destination: search_params["destination"],
         departure_date: map_to_iso8601(search_params["date_of_departure"])
-      },
-      %{
-        origin: search_params["destination"],
-        destination: search_params["origin"],
-        departure_date: map_to_iso8601(search_params["date_of_return"])
       }
     ]
-    passengers = Enum.map(1..String.to_integer(search_params["number_of_adults"]), fn _x -> %{ type: "adult" } end)
+    passengers = Enum.map(List.duplicate(:elem, String.to_integer(search_params["number_of_adults"])), fn _x -> %{ type: "adult" } end)
     %Request{}
     |> Map.put(:slices, slices)
     |> Map.put(:cabin_class, search_params["seat_class"])
