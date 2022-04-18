@@ -20,7 +20,6 @@ defmodule FlyingPenguinWeb.Router do
   scope "/", FlyingPenguinWeb do
     pipe_through :browser
 
-    # live "/", PageLive, :index
     live "/search", SearchLive.New, :new
     get "/", PageController, :index
   end
