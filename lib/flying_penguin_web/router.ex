@@ -21,7 +21,7 @@ defmodule FlyingPenguinWeb.Router do
     pipe_through :browser
 
     # live "/", PageLive, :index
-    # live "/search", SearchLive.New, :new
+    live "/search", SearchLive.New, :new
     get "/", PageController, :index
   end
 
