@@ -19,29 +19,40 @@ import "../css/app.css"
 //     import "some-package"
 //
 
-// Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
-import "phoenix_html"
-// Establish Phoenix Socket and LiveView configuration.
-import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {
+  BrowserRouter as Router,
+  Link
+} from 'react-router-dom'
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+import Routes from './Routes'
 
+export default function App() {
+  return (
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li>
+              <Link to='/'>Home</Link>
+            </li>
+            <li>
+              <Link to='/pings'>Pings</Link>
+            </li>
+            <li>
+              <Link to='/other'>Other Pings</Link>
+            </li>
+            <li>
+              <Link to='/count'>Counter</Link>
+            </li>
+          </ul>
+        </nav>
 
-// connect if there are any LiveViews on the page
-liveSocket.connect()
+        <Routes />
+      </div>
+    </Router>
+  )
+}
 
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
-// >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket
-
-import React from "react";
-import ReactDOM from "react-dom";
-
-import Greeter from "./greeter";
-
-const greeting = document.getElementById("root");
-ReactDOM.render(<Greeter name="Phoenix" />, greeting);
+ReactDOM.render(<App />, document.getElementById('root'))
