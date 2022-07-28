@@ -41,5 +41,6 @@ defmodule FlyingPenguin.Flight.Search do
       :number_of_adults
     ])
     |> validate_inclusion(:seat_class, ["economy", "business", "premium_economy", "first"])
+    |> validate_inclusion(:number_of_adults, 1..8)
   end
 end
