@@ -58,7 +58,7 @@ defmodule FlyingPenguin.MixProject do
       {:premailex, "~> 0.3.0"},
 
       # http client
-      {:httpoison, "~> 1.8"},
+      {:httpoison, "~> 2.0"},
       {:poison, "~> 5.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
